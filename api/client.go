@@ -306,7 +306,7 @@ type Client struct {
 	Debug      bool
 	Logger     *log.Logger
 	TimeOffset int64
-	do         doFunc
+	do         doFunc // Different do methods
 }
 
 func (c *Client) debug(format string, v ...interface{}) {
@@ -389,7 +389,7 @@ func (c *Client) callAPI(ctx context.Context, r *request, opts ...RequestOption)
 	if f == nil {
 		f = c.HTTPClient.Do
 	}
-	res, err := f(req)
+	res, err := f(req) // Issue the request and get the resp and err.
 	if err != nil {
 		return []byte{}, err
 	}
@@ -424,4 +424,9 @@ func (c *Client) callAPI(ctx context.Context, r *request, opts ...RequestOption)
 func (c *Client) SetApiEndpoint(url string) *Client {
 	c.BaseURL = url
 	return c
+}
+
+// NewDepthService init depth service
+func (c *Client) NewDepthService() *DepthService {
+	return &DepthService{c: c}
 }
