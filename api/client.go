@@ -3,8 +3,6 @@ package binance
 import (
 	"bytes"
 	"context"
-	"crypto/hmac"
-	"crypto/sha256"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -261,10 +259,8 @@ func getAPIEndpoint() string {
 // NewClient initialize an API client instance with API key and secret key.
 // You should always call this function before using this SDK.
 // Services will be created by the form client.NewXXXService().
-func NewClient(apiKey, secretKey string) *Client {
+func NewClient() *Client {
 	return &Client{
-		APIKey:     apiKey,
-		SecretKey:  secretKey,
 		BaseURL:    getAPIEndpoint(),
 		UserAgent:  "Binance/golang",
 		HTTPClient: http.DefaultClient,
@@ -283,8 +279,6 @@ func NewProxiedClient(apiKey, secretKey, proxyUrl string) *Client {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	return &Client{
-		APIKey:    apiKey,
-		SecretKey: secretKey,
 		BaseURL:   getAPIEndpoint(),
 		UserAgent: "Binance/golang",
 		HTTPClient: &http.Client{
@@ -298,8 +292,6 @@ type doFunc func(req *http.Request) (*http.Response, error)
 
 // Client define API client
 type Client struct {
-	APIKey     string
-	SecretKey  string
 	BaseURL    string
 	UserAgent  string
 	HTTPClient *http.Client
@@ -342,25 +334,6 @@ func (c *Client) parseRequest(r *request, opts ...RequestOption) (err error) {
 	if bodyString != "" {
 		header.Set("Content-Type", "application/x-www-form-urlencoded")
 		body = bytes.NewBufferString(bodyString)
-	}
-	if r.secType == secTypeAPIKey || r.secType == secTypeSigned {
-		header.Set("X-MBX-APIKEY", c.APIKey)
-	}
-
-	if r.secType == secTypeSigned {
-		raw := fmt.Sprintf("%s%s", queryString, bodyString)
-		mac := hmac.New(sha256.New, []byte(c.SecretKey))
-		_, err = mac.Write([]byte(raw))
-		if err != nil {
-			return err
-		}
-		v := url.Values{}
-		v.Set(signatureKey, fmt.Sprintf("%x", (mac.Sum(nil))))
-		if queryString == "" {
-			queryString = v.Encode()
-		} else {
-			queryString = fmt.Sprintf("%s&%s", queryString, v.Encode())
-		}
 	}
 	if queryString != "" {
 		fullURL = fmt.Sprintf("%s?%s", fullURL, queryString)
