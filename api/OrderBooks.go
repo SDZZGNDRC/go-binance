@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 )
 
-func (c *Client) GetOrderBooks(params *[]string) (interface{}, error) {
+func (c *Client) GetOrderBooks(params []string) (interface{}, error) {
 	req := Request{
 		Path:   "/api/v3/depth",
 		Method: "GET",
 		Param: GetBooksParam{
-			Symbol: (*params)[0],
-			Limit:  (*params)[1],
+			Symbol: params[0],
+			Limit:  params[1],
 		},
 	}
 	raw_data, date, err := c.do(req)

@@ -35,8 +35,8 @@ func (c *Client) do(r IRequest) ([]byte, *string, error) {
 		return nil, nil, err
 	}
 	defer resp.Body.Close()
-	date = &resp.Header["date"][0]
-	if len(resp.Header["date"]) > 1 {
+	date = &resp.Header[http.CanonicalHeaderKey("date")][0]
+	if len(resp.Header[http.CanonicalHeaderKey("date")]) > 1 {
 		panic("len(resp.Header[\"date\"]) > 1")
 	}
 	if resp.StatusCode != http.StatusOK {
