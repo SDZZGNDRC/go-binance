@@ -14,11 +14,11 @@ func (c *Client) GetOrderBooks(params []string) (interface{}, error) {
 		},
 	}
 	raw_data, date, err := c.do(req)
-	data := &BooksData{
-		Date: *date,
-	}
 	if err != nil {
 		return nil, err
+	}
+	data := &BooksData{
+		Date: *date,
 	}
 	if err := json.Unmarshal(raw_data, data); err != nil {
 		return nil, err

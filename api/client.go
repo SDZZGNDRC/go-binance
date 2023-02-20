@@ -19,7 +19,7 @@ type Client struct {
 // new *Client
 func New(c *http.Client) *Client {
 	return &Client{
-		Host: "api.binance.com",
+		Host: "https://api.binance.com",
 		C:    c,
 	}
 }
@@ -32,7 +32,7 @@ func (c *Client) do(r IRequest) ([]byte, *string, error) {
 	req := c.newRequest(r)
 	resp, err := c.C.Do(req)
 	if err != nil { // ======================
-		return nil, nil, err
+		return nil, date, err
 	}
 	defer resp.Body.Close()
 	date = &resp.Header[http.CanonicalHeaderKey("date")][0]
